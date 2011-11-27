@@ -12,7 +12,7 @@
         var $container = $('<div class="metro-container"></div>');
         var $navigatorForward = $('<button class="metro-navigator forward"></button>');
         var $navigatorReverse = $('<button class="metro-navigator reverse"></button>');
-        var items = [];
+        var tiles = [];
         var pagesCount = 0;
         var pages = {};
         var cursor = 0;
@@ -62,14 +62,14 @@
             return $this;
         };
 
-        var drawItem = function(item) {
-            var $item = $('<div class="metro-item"></div>');
+        var drawTile = function(tile) {
+            var $tile = $('<div class="metro-tile"></div>');
             var page = null;
 
-            $item.append(item.view);
-            $item.data('record', item.record);
+            $tile.append(tile.view);
+            $tile.data('record', tile.record);
 
-            while (!fitsInCanvas(pencil.x, pencil.y, item.format.width, item.format.height)) {
+            while (!fitsInCanvas(pencil.x, pencil.y, tile.format.width, tile.format.height)) {
                 pencil.y++;
 
                 if (pencil.y == options.dimensions.y) {
@@ -88,22 +88,20 @@
                 pages[page] = [];
             }
 
-            pages[page].push($item);
+            pages[page].push($tile);
 
             if (page != cursor)
-                $item.addClass('outside');
-            else
-                $item.addClass('inside');
+                $tile.addClass('outsight');
 
-            $item.css({
-              width : (item.format.width * options.size + (item.format.width - 1) * options.spacing) + 'px',
-              height : (item.format.height * options.size + (item.format.height - 1) * options.spacing) + 'px',
+            $tile.css({
+              width : (tile.format.width * options.size + (tile.format.width - 1) * options.spacing) + 'px',
+              height : (tile.format.height * options.size + (tile.format.height - 1) * options.spacing) + 'px',
               left : (pencil.x * (options.size + options.spacing)) + 'px',
              'top' : (pencil.y * (options.size + options.spacing)) + 'px'
             });
-            $item.hide().appendTo($container).fadeIn(1500);
+            $tile.appendTo($container);
 
-            occupyCanvas(pencil.x, pencil.y, item.format.width, item.format.height);
+            occupyCanvas(pencil.x, pencil.y, tile.format.width, tile.format.height);
         };
 
         var clearCanvas = function() {
@@ -136,20 +134,20 @@
         };
 
         var loadChunk = function() {
-            var lastItem = null;
+            var lastRecord = null;
         
-            if (items.length > 0)
-                lastItem = items[items.length - 1].record;
+            if (tiles.length > 0)
+                lastRecord = tiles[tiles.length - 1].record;
         
-            params.source.fetch(lastItem, options.chunkSize);
+            params.source.fetch(lastRecord, options.chunkSize);
         };
         
         var shift = function(newCursor) {
             if (newCursor < 0 || newCursor >= pagesCount)
                 return;
 
-            $.each(pages[cursor], function(i, item) {
-                item.addClass('outside');
+            $.each(pages[cursor], function(i, tile) {
+                tile.addClass('outsight');
             });
 
             cursor = newCursor;
@@ -157,8 +155,8 @@
             if (!pages[cursor + 5])
                 loadChunk();
 
-            $.each(pages[cursor], function(i, item) {
-                item.removeClass('outside');
+            $.each(pages[cursor], function(i, tile) {
+                tile.removeClass('outsight');
             });
 
             $container.animate({left : (options.offset.x - cursor * options.dimensions.x * (options.size + options.spacing)) + 'px'});
@@ -171,23 +169,23 @@
         $this.getVisibleRecords = function() {
             var records = [];
 
-            $.each(pages[cursor], function(i, item) {
-                records.push(item.data('record'));
+            $.each(pages[cursor], function(i, tile) {
+                records.push(tile.data('record'));
             });
 
             return records;
         };
 
-        $this.itemAdded = function(record) {
+        $this.tileAdded = function(record) {
             var format = params.formatter(record);
-            var item = { 
+            var tile = { 
               record : record, 
               format : format, 
               view : params.viewer(record, format, $this)
             };
 
-            items.push(item);
-            drawItem(item);
+            tiles.push(tile);
+            drawTile(tile);
         };
 
         $this.forward = function() {
@@ -207,11 +205,11 @@ var AjaxMetroSource = function(url) {
 
     this.listeners = [];
 
-    this.fetch = function(pivotItem, count) {
-        $.getJSON(url.replace('{count}', count), { pivot : pivotItem }, function(data) {
+    this.fetch = function(pivotRecord, count) {
+        $.getJSON(url.replace('{count}', count), { pivot : pivotRecord }, function(data) {
             $.each(data, function(i, record) {
                 $.each($this.listeners, function(i, listener) {
-                    listener.itemAdded(record);
+                    listener.tileAdded(record);
                 });
             });
         });
