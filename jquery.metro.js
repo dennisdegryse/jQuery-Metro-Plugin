@@ -12,7 +12,6 @@
         var $container = $('<div class="metro-container"></div>');
         var $navigatorForward = $('<button class="metro-navigator forward"></button>');
         var $navigatorReverse = $('<button class="metro-navigator reverse"></button>');
-        var tiles = [];
         var pagesCount = 0;
         var pages = {};
         var cursor = 0;
@@ -38,9 +37,11 @@
             options.offset.x = Math.floor(($this.width() - options.dimensions.x * (options.size + options.spacing)) / 2); 
             options.offset.y = Math.floor(($this.height() - options.dimensions.y * (options.size + options.spacing)) / 2);
 
+            alert(options.dimensions.x + ', ' + options.dimensions.y);
+
             $container.css({
               left : options.offset.x + 'px',
-             'top' : options.offset.y + 'px',
+              'top' : options.offset.y + 'px',
             });
 
             $navigatorReverse.click($this.reverse);
@@ -62,14 +63,13 @@
             return $this;
         };
 
-        var drawTile = function(tile) {
+        var drawTile = function(record, format, $view) {
             var $tile = $('<div class="metro-tile"></div>');
             var page = null;
 
-            $tile.append(tile.view);
-            $tile.data('record', tile.record);
+            $tile.append($view);
 
-            while (!fitsInCanvas(pencil.x, pencil.y, tile.format.width, tile.format.height)) {
+            while (!fitsInCanvas(pencil.x, pencil.y, format.width, format.height)) {
                 pencil.y++;
 
                 if (pencil.y == options.dimensions.y) {
@@ -94,14 +94,16 @@
                 $tile.addClass('outsight');
 
             $tile.css({
-              width : (tile.format.width * options.size + (tile.format.width - 1) * options.spacing) + 'px',
-              height : (tile.format.height * options.size + (tile.format.height - 1) * options.spacing) + 'px',
+              width : (format.width * options.size + (format.width - 1) * options.spacing) + 'px',
+              height : (format.height * options.size + (format.height - 1) * options.spacing) + 'px',
               left : (pencil.x * (options.size + options.spacing)) + 'px',
-             'top' : (pencil.y * (options.size + options.spacing)) + 'px'
+              'top' : (pencil.y * (options.size + options.spacing)) + 'px'
             });
-            $tile.appendTo($container);
 
-            occupyCanvas(pencil.x, pencil.y, tile.format.width, tile.format.height);
+            $tile.appendTo($container);
+            $tile.data('record', record);
+
+            occupyCanvas(pencil.x, pencil.y, format.width, format.height);
         };
 
         var clearCanvas = function() {
@@ -134,11 +136,14 @@
         };
 
         var loadChunk = function() {
+            var lastPage = null;
             var lastRecord = null;
         
-            if (tiles.length > 0)
-                lastRecord = tiles[tiles.length - 1].record;
-        
+            if (pagesCount > 0) {
+                lastPage = pages[pagesCount - 1];
+                lastRecord = lastPage[lastPage.length - 1].data('record');
+            }
+
             params.source.fetch(lastRecord, options.chunkSize);
         };
         
@@ -146,8 +151,8 @@
             if (newCursor < 0 || newCursor >= pagesCount)
                 return;
 
-            $.each(pages[cursor], function(i, tile) {
-                tile.addClass('outsight');
+            $.each(pages[cursor], function(i, $tile) {
+                $tile.addClass('outsight');
             });
 
             cursor = newCursor;
@@ -155,8 +160,8 @@
             if (!pages[cursor + 5])
                 loadChunk();
 
-            $.each(pages[cursor], function(i, tile) {
-                tile.removeClass('outsight');
+            $.each(pages[cursor], function(i, $tile) {
+                $tile.removeClass('outsight');
             });
 
             $container.animate({left : (options.offset.x - cursor * options.dimensions.x * (options.size + options.spacing)) + 'px'});
@@ -169,8 +174,8 @@
         $this.getVisibleRecords = function() {
             var records = [];
 
-            $.each(pages[cursor], function(i, tile) {
-                records.push(tile.data('record'));
+            $.each(pages[cursor], function(i, $tile) {
+                records.push($tile.data('record'));
             });
 
             return records;
@@ -178,14 +183,9 @@
 
         $this.tileAdded = function(record) {
             var format = params.formatter(record);
-            var tile = { 
-              record : record, 
-              format : format, 
-              view : params.viewer(record, format, $this)
-            };
+            var $view = params.viewer(record, format, $this);
 
-            tiles.push(tile);
-            drawTile(tile);
+            drawTile(record, format, $view);
         };
 
         $this.forward = function() {
@@ -208,7 +208,7 @@ var AjaxMetroSource = function(url) {
     this.fetch = function(pivotRecord, count) {
         $.getJSON(url, { count : count, pivot : pivotRecord }, function(data) {
             $.each(data, function(i, record) {
-                $.each($this.listeners, function(i, listener) {
+                $.each($this.listeners, function(j, listener) {
                     listener.tileAdded(record);
                 });
             });
