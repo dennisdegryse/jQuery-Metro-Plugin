@@ -206,7 +206,7 @@ var AjaxMetroSource = function(url) {
     this.listeners = [];
 
     this.fetch = function(pivotRecord, count) {
-        $.getJSON(url.replace('{count}', count), { pivot : pivotRecord }, function(data) {
+        $.getJSON(url, { count : count, pivot : pivotRecord }, function(data) {
             $.each(data, function(i, record) {
                 $.each($this.listeners, function(i, listener) {
                     listener.tileAdded(record);
