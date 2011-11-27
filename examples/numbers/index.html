@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>jQuery Metro Plugin - Example 1</title>
+    <meta charset="utf-8">
+    <link type="text/css" rel="stylesheet" href="/jquery.metro.css">
+    <style type="text/css">
+      #metro {
+          position: fixed;
+          top: 50px;
+          bottom: 0px;
+          left: 0px;
+          right: 0px;
+      }
+
+      .metro-tile > div > span {
+          display: block;
+          font-size: 50px;
+          padding: 40px 10px;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/jquery.metro.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+          var isPrime = function(number) {
+              var divisor = 1;
+
+              if (number < 2)
+                  return false;
+
+              while (divisor++ < Math.floor(Math.sqrt(number)))
+                  if (number % divisor === 0)
+                      return false;
+
+              return true;
+          };
+
+          var isFibonacci = function(number) {
+              var f1 = 0;
+              var f2 = 1;
+
+              while (f2 < number) {
+                  f2 += f1;
+                  f1 = f2 - f1;
+              }
+
+              if (f2 == number)
+                  return true;
+
+              return false;
+          };
+
+          var $metro = $('#metro').metro({
+              source : new AjaxMetroSource('/get.php?count={count}'),
+              formatter : function(record) {
+                  var format = {
+                    width : 1,
+                    height : 1
+                  };
+
+                  if (isPrime(record.number))
+                      format.width++;
+
+                  if (isFibonacci(record.number))
+                      format.height++;
+
+                  return format;
+              },
+              viewer : function(record, format, metro) {
+                  return $('<div style="background-color: #' + ['f00', '0f0', '00f'][Math.round(Math.random() * 2)] + '"><span>' + record.number + '</span></div>').hide().fadeIn(1500);
+              }
+          });
+
+          /* navigate with keyboard arrows */
+          var keyLock = false;
+
+          var acquireKeyLock = function() {
+              if (keyLock)
+                  return false;
+
+              keyLock = true;
+              setTimeout(function() { keyLock = false; }, 500);
+
+              return true;
+          };
+
+          $(document).keydown(function(event) {
+              if (event.keyCode == 39)
+                  acquireKeyLock() && $metro.forward();
+
+              if (event.keyCode == 37)
+                  acquireKeyLock() && $metro.reverse();
+          });
+       });
+    </script>
+  </head>
+  <body>
+    <h1>jQuery Metro Plugin - Example 1</h1>
+    <div id="metro"></div>
+  </body>
+</html>

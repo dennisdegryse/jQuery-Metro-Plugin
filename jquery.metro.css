@@ -1,0 +1,39 @@
+.metro {
+    position: relative;
+    overflow: hidden;
+}
+
+.metro-container {
+    position: relative;
+    width: auto;
+    height: auto;
+}
+
+.metro-navigator {
+    outline: none;
+    background: transparent;
+    border: none;
+    position: absolute;
+    height: 100%;
+    top: 0px;
+}
+
+.metro-tile {
+    position: absolute;
+}
+
+.metro-tile.outsight {
+    opacity: 0.2;
+}
+
+.metro-tile > * {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* mozilla fix */
+.metro-navigator::-moz-focus-inner {
+  border: 0;
+}
