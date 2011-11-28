@@ -37,8 +37,6 @@
             options.offset.x = Math.floor(($this.width() - options.dimensions.x * (options.size + options.spacing)) / 2); 
             options.offset.y = Math.floor(($this.height() - options.dimensions.y * (options.size + options.spacing)) / 2);
 
-            alert(options.dimensions.x + ', ' + options.dimensions.y);
-
             $container.css({
               left : options.offset.x + 'px',
               'top' : options.offset.y + 'px',
