@@ -48,23 +48,6 @@
     height: auto;
 }
 
-.metro-navigator {
-    outline: none;
-    background: transparent;
-    border: none;
-    position: absolute;
-    height: 100%;
-    top: 0px;
-}
-
-.metro-navigator.forward {
-    right: 0px;
-}
-
-.metro-navigator.reverse {
-    left: 0px;
-}
-
 .metro-tile {
     position: absolute;
     display: block;
@@ -85,5 +68,57 @@
 
 /* mozilla fix */
 .metro-navigator::-moz-focus-inner {
-  border: 0;
+    border: 0;
+}
+
+.metro-menu {
+    display: block;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 0px;
+    height: 30px;
+    background: #000;
+    list-style: none;
+}
+
+.metro-menu > * {
+    padding: 0;
+    margin: 0;
+}
+
+.metro-menu-forward {
+    position: absolute;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    background: #ccc;
+    top: 0px;
+}
+
+.metro-menu-reverse {
+    position: absolute;
+    left: 0px;
+    width: 30px;
+    height: 30px;
+    background: #ccc;
+    top: 0px;
+}
+
+.metro-menu-scroll {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    height: 10px;
+    background: #222;
+    top: 10px;
+}
+
+.metro-scrollbar-handle {
+    display: block;
+    width: 50px;
+    height: 100%;
+    background: #ccc;
 }

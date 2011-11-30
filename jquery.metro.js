@@ -6,6 +6,7 @@
           viewer : null,
           formatter : null,
           grouper : null,
+          controls : true,
           size: 150,
           spacing: 10,
         };
@@ -23,7 +24,12 @@
 
             $this.addClass('metro');
             $sections.metroSection($this, {}).css('left', $this.width() + 'px');
+
+            if (params.controls)
+                $('<menu></menu>').metroMenu($this, {}).appendTo($this);
+
             $this.gotoSection($sections.first().attr('data-label'));
+            $this.data('metro', $this);
 
             return $this;
         };
@@ -32,14 +38,26 @@
             return params[key];
         };
 
-        $this.sections = function() {
-            return $this.children('.metro-section');
+        $this.sections = function(key) {
+            var $sections = $this.children('.metro-section');
+
+            if (key !== undefined)
+                $sections = $sections.filter('[data-label="' + key + '"]');
+
+            return $sections;
+        };
+
+        $this.menu = function() {
+            return $this.children('.metro-menu').data('metro');
+        };
+
+        $this.activeSection = function() {
+            return $this.sections().filter('.active').data('metro');
         };
 
         $this.gotoSection = function(label) {
-            var $sections = $this.sections();
-            var $activeSection = $sections.filter('.active');
-            var $section = $sections.filter('[data-label="' + label + '"]');
+            var $activeSection = $this.activeSection();
+            var $section = $this.sections(label);
             var position = $this.width();
             var speed = position * 0.3;
 
@@ -54,32 +72,22 @@
             }
 
             $section.addClass('active').css('left', -position + 'px').animate({ left : '0px'}, speed);
+
+            $this.menu().update($section);
+        };
+
+        $this.gotoPosition = function(position, scale) {
+            $this.activeSection().gotoPosition(position, scale);
         };
 
         $this.forward = function() {
-            $this.sections().filter('.active').data('metro').forward();
+            $this.activeSection().forward();
         };
 
         $this.reverse = function() {
-            $this.sections().filter('.active').data('metro').reverse();
+            $this.activeSection().reverse();
         };
 
         return initialize();
     };
 })($);
-
-var AjaxMetroSource = function(url) {
-    var $this = this;
-
-    this.listeners = [];
-
-    this.fetch = function(pivotRecord, count) {
-        $.getJSON(url, { count : count, pivot : pivotRecord }, function(data) {
-            $.each(data, function(i, record) {
-                $.each($this.listeners, function(j, listener) {
-                    listener.tileAdded(record);
-                });
-            });
-        });
-    };
-};

@@ -26,8 +26,6 @@
         return result;
     };
 })($);
-
-
 ;(function($) {
     $.fn.metroTile = function(parent, params) {
         var $this = $(this);
@@ -75,8 +73,6 @@
         return initialize();
     };
 })($);
-
-
 ;(function($) {
     $.fn.metroTileGroup = function(parent, params) {
         var $this = $(this);
@@ -195,8 +191,6 @@
         return initialize();
     };
 })($);
-
-
 ;(function($) {
     $.fn.metroSection = function(parent, params) {
         var $this = $(this);
@@ -240,9 +234,6 @@
 
             $this.children('ul').metroTileGroup($this, {}).appendTo($container);
 
-            $('<button class="metro-navigator forward"></button>').width(params.size + 'px').click(function() { $this.forward(); }).appendTo($this);
-            $('<button class="metro-navigator reverse"></button>').width(params.size + 'px').click(function() { $this.reverse(); }).appendTo($this);
-
             if (params.source)
                 fetchData();
 
@@ -258,7 +249,7 @@
                     var group = params.grouper(record);
                     var $tile = $('<li></li>').metroTile($this, { record : record, width : size.width, height : size.height });
 
-                    $this.groups(group).data('metro').putTile($tile);
+                    $this.groups(group).putTile($tile);
                 });
             });
         };
@@ -267,20 +258,25 @@
             var original = $this.container().position().left;
             var diff = Math.abs(original - position);
 
-            $this.container().animate({ left : position + 'px' }, 0.4 * diff);
+            $this.container().stop(true, false);
+
+            if (diff > 200)
+                $this.container().animate({ left : position + 'px' }, Math.min(0.4 * diff, 1200));
+            else
+                $this.container().css({ left : position + 'px' });
         };
 
         var reorderGroups = function() {
             var position = 0;
             var count = 0;
 
-            $this.groups().each(function() {
-                $(this).css({
+            $.each($this.groups(), function(i, $group) {
+                $group.css({
                    left : position * (params.size + params.spacing) + count * params.groupSpacing + 'px',
                    top : '0px'
                 });
 
-                position += $(this).data('metro').size();
+                position += $group.size();
                 count++;
             });
         };
@@ -293,6 +289,44 @@
             return $group;
         };
 
+        var calcSize = function() {
+            var size = 0;
+
+            $.each($this.groups(), function(i, $group) {
+                size += $group.size() * (params.size + params.spacing) + params.groupSpacing;
+            });
+
+            return size;
+        };
+
+        var calcColumns = function() {
+            var count = 0;
+
+            $.each($this.groups(), function(i, $group) {
+                count += $group.size();
+            });
+
+            return count;
+        };
+
+        var calcColumnPosition = function(index) {
+            var position = 0;
+            var groups = 0;
+
+            $.each($this.groups(), function(i, $group) {
+                position += $group.size();
+
+                if (position < index)
+                    groups++;
+            });
+
+            return (index - 1) * (params.size + params.spacing) + groups * params.groupSpacing;
+        };
+
+        var calcScale = function() {
+            return calcSize() - dimensions.width * (params.size + params.spacing);
+        };
+
         $this.dimensions = function() {
             return dimensions;
         };
@@ -302,17 +336,28 @@
         };
 
         $this.groups = function(key) {
-            var $result = $this.container().children('.metro-tile-group');
+            var $groups = $this.container().children('.metro-tile-group');
+            var $result = [];
 
             if (key === undefined)
-                return $result;
+                $groups.each(function() {
+                    $result.push($(this).data('metro'));
+                });
+            else {
+                $result = $groups.filter('[data-label="' + key + '"]').data('metro');
 
-            $result = $result.filter('[data-label="' + key + '"]');
-
-            if ($result.length == 0)
-                $result = addGroup(key);
+                if (!$result)
+                    $result = addGroup(key).data('metro');
+            }
 
             return $result;
+        };
+
+        $this.scrollPosition = function() {
+            return {
+              scale : calcScale(),
+              x : offset.x - $this.container().position().left
+            };
         };
 
         $this.param = function(key) {
@@ -320,25 +365,139 @@
         };
 
         $this.forward = function() {
-            var size = 0;
-            var step = dimensions.width * (params.size + params.spacing);
+            var size = calcSize();
+            var target = Math.max($this.container().position().left - dimensions.width * (params.size + params.spacing), offset.x - size + dimensions.width * (params.size + params.spacing));
 
-            $this.groups().each(function() {
-                size += $(this).data('metro').size() * (params.size + params.spacing) + params.groupSpacing;
-            });
-
-            move(Math.max($this.container().position().left - step, offset.x - size + step));
+            move(target);
+            parent.menu().scrollBar().set(offset.x - target, calcScale());
         };
 
         $this.reverse = function() {
-            move(Math.min($this.container().position().left + dimensions.width * (params.size + params.spacing), offset.x));
+            var target = Math.min($this.container().position().left + dimensions.width * (params.size + params.spacing), offset.x);
+
+            move(target);
+            parent.menu().scrollBar().set(offset.x - target, calcScale());
+        };
+
+        $this.gotoPosition = function(position, scale) {
+            var size = calcSize() - dimensions.width * (params.size + params.spacing);
+
+            move(offset.x - size/scale*position);
         };
 
         return initialize();
     };
 })($);
+;(function($) {
+    $.fn.metroScrollBar = function(parent, params) {
+        var $this = $(this);
 
+        var defaults = {
+            scroll : null
+        };
 
+        params = $.extend(defaults, params);
+
+        if (this.length > 1) {
+            this.each(function() { $(this).metroScrollBar(params); });
+
+            return this;
+        }
+
+        var initialize = function() {
+            $this.addClass('metro-scrollbar');
+
+            $('<span class="metro-scrollbar-handle"></span>').appendTo($this).draggable({
+                axis : 'x', 
+                containment: 'parent', 
+                drag : function(event, ui){
+                    params.scroll(ui.position.left, $this.width() - $(this).width());
+                }
+            });
+
+            $this.data('metro', $this);
+
+            return $this;
+        };
+
+        $this.set = function(x, scale) {
+            var $handle = $this.handle();
+            var target = x / scale * ($this.width() - $handle.width());
+
+            $handle.animate({ left : target + 'px' });
+
+            return $this;
+        };
+
+        $this.handle = function() {
+            return $this.children('.metro-scrollbar-handle');
+        };
+
+        $this.scroll = function(callback) {
+            params.scroll = callback;
+
+            return $this;
+        };
+
+        $this.param = function(key) {
+            return params[key];
+        };
+
+        return initialize();
+    };
+})($);
+;(function($) {
+    $.fn.metroMenu = function(parent, params) {
+        var $this = $(this);
+
+        var defaults = {
+        };
+
+        params = $.extend(defaults, params);
+
+        if (this.length > 1) {
+            this.each(function() { $(this).metroMenu(params); });
+
+            return this;
+        }
+
+        var initialize = function() {
+            $this.addClass('metro-menu');
+
+            $('<li class="metro-menu-reverse"></li>').appendTo($this).click(function() {
+                parent.data('metro').reverse();
+            });
+
+            $('<li class="metro-menu-scroll"></li>').metroScrollBar($this, {}).appendTo($this).scroll(function(x, scale) {
+                parent.data('metro').gotoPosition(x, scale);
+            });
+
+            $('<li class="metro-menu-forward"></li>').appendTo($this).click(function() {
+                parent.data('metro').forward();
+            });
+
+            $this.data('metro', $this);
+
+            return $this;
+        };
+
+        $this.scrollBar = function() {
+            return $this.children('.metro-menu-scroll').data('metro');
+        };
+
+        $this.param = function(key) {
+            return params[key];
+        };
+
+        $this.update = function($section) {
+            var position = $section.data('metro').scrollPosition();
+
+            $this.scrollBar().set(position.x, position.scale);
+        };
+
+        return initialize();
+    };
+})($);
 ;(function($) {
     $.fn.metro = function(params) {
         var $this = $(this);
@@ -347,6 +506,7 @@
           viewer : null,
           formatter : null,
           grouper : null,
+          controls : true,
           size: 150,
           spacing: 10,
         };
@@ -364,7 +524,12 @@
 
             $this.addClass('metro');
             $sections.metroSection($this, {}).css('left', $this.width() + 'px');
+
+            if (params.controls)
+                $('<menu></menu>').metroMenu($this, {}).appendTo($this);
+
             $this.gotoSection($sections.first().attr('data-label'));
+            $this.data('metro', $this);
 
             return $this;
         };
@@ -373,14 +538,26 @@
             return params[key];
         };
 
-        $this.sections = function() {
-            return $this.children('.metro-section');
+        $this.sections = function(key) {
+            var $sections = $this.children('.metro-section');
+
+            if (key !== undefined)
+                $sections = $sections.filter('[data-label="' + key + '"]');
+
+            return $sections;
+        };
+
+        $this.menu = function() {
+            return $this.children('.metro-menu').data('metro');
+        };
+
+        $this.activeSection = function() {
+            return $this.sections().filter('.active').data('metro');
         };
 
         $this.gotoSection = function(label) {
-            var $sections = $this.sections();
-            var $activeSection = $sections.filter('.active');
-            var $section = $sections.filter('[data-label="' + label + '"]');
+            var $activeSection = $this.activeSection();
+            var $section = $this.sections(label);
             var position = $this.width();
             var speed = position * 0.3;
 
@@ -395,32 +572,22 @@
             }
 
             $section.addClass('active').css('left', -position + 'px').animate({ left : '0px'}, speed);
+
+            $this.menu().update($section);
+        };
+
+        $this.gotoPosition = function(position, scale) {
+            $this.activeSection().gotoPosition(position, scale);
         };
 
         $this.forward = function() {
-            $this.sections().filter('.active').data('metro').forward();
+            $this.activeSection().forward();
         };
 
         $this.reverse = function() {
-            $this.sections().filter('.active').data('metro').reverse();
+            $this.activeSection().reverse();
         };
 
         return initialize();
     };
 })($);
-
-var AjaxMetroSource = function(url) {
-    var $this = this;
-
-    this.listeners = [];
-
-    this.fetch = function(pivotRecord, count) {
-        $.getJSON(url, { count : count, pivot : pivotRecord }, function(data) {
-            $.each(data, function(i, record) {
-                $.each($this.listeners, function(j, listener) {
-                    listener.tileAdded(record);
-                });
-            });
-        });
-    };
-};
