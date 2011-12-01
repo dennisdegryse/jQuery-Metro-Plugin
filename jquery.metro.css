@@ -44,8 +44,7 @@
     margin: 0px;
     padding: 0px;
     position: relative;
-    width: auto;
-    height: auto;
+    height: 100%;
 }
 
 .metro-tile {

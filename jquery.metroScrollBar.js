@@ -34,7 +34,7 @@
             var $handle = $this.handle();
             var target = x / scale * ($this.width() - $handle.width());
 
-            $handle.animate({ left : target + 'px' });
+            $handle.stop(true, false).animate({ left : target + 'px' });
 
             return $this;
         };

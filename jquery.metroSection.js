@@ -32,14 +32,18 @@
         };
 
         var initialize = function() {
-            $this.addClass('metro-section');
+            $this.addClass('metro-section')
 
             var $container = $('<div class="metro-tile-container"></div>').css({
-              left : offset.x + 'px',
-              top : offset.y + 'px'
-            }).appendTo($this);
+              left : '0px',
+              top : offset.y + 'px',
+              width: '1px'
+            }).draggable({
+              axis: 'x',
+            }).appendTo($this).on('drag', function() { updateScrollBar(); });
 
             $this.children('ul').metroTileGroup($this, {}).appendTo($container);
+            reorderGroups();
 
             if (params.source)
                 fetchData();
@@ -57,6 +61,8 @@
                     var $tile = $('<li></li>').metroTile($this, { record : record, width : size.width, height : size.height });
 
                     $this.groups(group).putTile($tile);
+
+                    reorderGroups();
                 });
             });
         };
@@ -79,59 +85,45 @@
 
             $.each($this.groups(), function(i, $group) {
                 $group.css({
-                   left : position * (params.size + params.spacing) + count * params.groupSpacing + 'px',
+                   left : offset.x + position * (params.size + params.spacing) + count * params.groupSpacing + 'px',
                    top : '0px'
                 });
 
                 position += $group.size();
                 count++;
             });
+
+            $this.container().width(calcSize()).draggable('option', 'containment', [ -calcScale(), 0, 0, 0 ]);
         };
 
         var addGroup = function(key) {
             var $group = $('<ul></ul>').metroTileGroup($this, { label : key }).appendTo($this.container());
 
-            reorderGroups();
-
             return $group;
         };
 
         var calcSize = function() {
-            var size = 0;
+            var size = 2 * offset.x;
+            var $groups = $this.groups();
 
-            $.each($this.groups(), function(i, $group) {
-                size += $group.size() * (params.size + params.spacing) + params.groupSpacing;
+            $.each($groups, function(i, $group) {
+                size += $group.size() * (params.size + params.spacing);
             });
+
+            size += params.groupSpacing * ($groups.length - 1);
 
             return size;
         };
 
-        var calcColumns = function() {
-            var count = 0;
-
-            $.each($this.groups(), function(i, $group) {
-                count += $group.size();
-            });
-
-            return count;
-        };
-
-        var calcColumnPosition = function(index) {
-            var position = 0;
-            var groups = 0;
-
-            $.each($this.groups(), function(i, $group) {
-                position += $group.size();
-
-                if (position < index)
-                    groups++;
-            });
-
-            return (index - 1) * (params.size + params.spacing) + groups * params.groupSpacing;
-        };
-
         var calcScale = function() {
-            return calcSize() - dimensions.width * (params.size + params.spacing);
+            return calcSize() - parent.width();
+        };
+
+        var updateScrollBar = function(position) {
+            if (position === undefined)
+                position = -$this.container().position().left;
+
+            parent.menu().scrollBar().set(position, calcScale());
         };
 
         $this.dimensions = function() {
@@ -163,7 +155,7 @@
         $this.scrollPosition = function() {
             return {
               scale : calcScale(),
-              x : offset.x - $this.container().position().left
+              x : - $this.container().position().left
             };
         };
 
@@ -172,24 +164,24 @@
         };
 
         $this.forward = function() {
-            var size = calcSize();
-            var target = Math.max($this.container().position().left - dimensions.width * (params.size + params.spacing), offset.x - size + dimensions.width * (params.size + params.spacing));
+            var size = calcScale();
+            var target = Math.max($this.container().position().left - dimensions.width * (params.size + params.spacing), -size);
 
             move(target);
-            parent.menu().scrollBar().set(offset.x - target, calcScale());
+            updateScrollBar(-target);
         };
 
         $this.reverse = function() {
-            var target = Math.min($this.container().position().left + dimensions.width * (params.size + params.spacing), offset.x);
+            var target = Math.min($this.container().position().left + dimensions.width * (params.size + params.spacing), 0);
 
             move(target);
-            parent.menu().scrollBar().set(offset.x - target, calcScale());
+            updateScrollBar(-target);
         };
 
         $this.gotoPosition = function(position, scale) {
-            var size = calcSize() - dimensions.width * (params.size + params.spacing);
+            var size = calcScale();
 
-            move(offset.x - size/scale*position);
+            move(- size / scale * position);
         };
 
         return initialize();
