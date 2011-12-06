@@ -18,15 +18,17 @@ Requirements
 ----------------
 
 This jQuery plugin requires:
-   * [jQuery v1.7.x](https://github.com/jquery/jquery)
-   * [jQuery UI v1.8.x](https://github.com/jquery/jquery-ui)
-   * [jQuery LabeledScrollbar Plugin](https://github.com/dennisdegryse/jQuery-LabeledScrollbar-Plugin)
-   * HTML5 (fix this with [html5shiv](http://code.google.com/p/html5shiv/) for older versions of IE)
+
+* [jQuery v1.7.x](https://github.com/jquery/jquery)
+* [jQuery UI v1.8.x](https://github.com/jquery/jquery-ui)
+* [jQuery LabeledScrollbar Plugin](https://github.com/dennisdegryse/jQuery-LabeledScrollbar-Plugin)
+* HTML5 (fix this with [html5shiv](http://code.google.com/p/html5shiv/) for older versions of IE)
 
 
 Licensing
 ----------------
 
 This software is protected by the Creative Commons (CC) License 'Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0). More information about this license can be found at:
-   * https://github.com/dennisdegryse/jQuery-Metro-Plugin/blob/master/CC-LICENSE.txt
-   * http://creativecommons.org/licenses/by-sa/3.0/
+
+* https://github.com/dennisdegryse/jQuery-Metro-Plugin/blob/master/CC-LICENSE.txt
+* http://creativecommons.org/licenses/by-sa/3.0/
