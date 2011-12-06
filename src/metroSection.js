@@ -168,13 +168,6 @@
 			return groups;
 		},
 		
-		_movePage : function(delta) {
-			var size = this._calcScale();
-			var target = Math.min(0, Math.max(this._getContainer().position().left - delta * this._dimensions.width * (this.options.size + this.options.spacing), -size));
-
-			this._move(target);
-		},
-		
 		getActiveGroup : function(position) {
 			var group = null;
 			var self = this;
@@ -201,13 +194,12 @@
 		getPosition : function() {
 			return - this._getContainer().position().left / this._calcScale();
 		},
+		
+		shiftPage : function(delta) {
+			var size = this._calcScale();
+			var target = Math.min(0, Math.max(this._getContainer().position().left - delta * this._dimensions.width * (this.options.size + this.options.spacing), -size));
 
-		forward : function() {
-			this._movePage(1);
-		},
-
-		reverse : function() {
-			this._movePage(-1);
+			this._move(target);
 		},
 
 		gotoPosition : function(position) {

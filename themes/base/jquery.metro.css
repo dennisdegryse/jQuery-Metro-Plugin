@@ -85,7 +85,7 @@
 
 .metro-menu-forward {
     position: absolute;
-    right: 0px;
+    right: 30px;
     width: 30px;
     height: 30px;
     background: #ccc;
@@ -94,17 +94,35 @@
 
 .metro-menu-reverse {
     position: absolute;
-    left: 0px;
+    left: 30px;
     width: 30px;
     height: 30px;
     background: #ccc;
     top: 0px;
 }
 
+.metro-menu-tail {
+    position: absolute;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    background: #aaa;
+    top: 0px;
+}
+
+.metro-menu-head {
+    position: absolute;
+    left: 0px;
+    width: 30px;
+    height: 30px;
+    background: #aaa;
+    top: 0px;
+}
+
 .metro-menu-scroll {
     position: absolute;
-    left: 30px;
-    right: 30px;
+    left: 60px;
+    right: 60px;
     height: 10px;
     background: #222;
     top: 10px;

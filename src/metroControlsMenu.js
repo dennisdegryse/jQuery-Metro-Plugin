@@ -10,6 +10,12 @@
 			
 			this.element.addClass('metro-menu');
 
+			$('<li class="metro-menu-head"></li>')
+				.appendTo(this.element)
+				.click(function(event) {
+					self.element.parent().metro('gotoHead');
+				});
+
 			$('<li class="metro-menu-reverse"></li>')
 				.appendTo(this.element)
 				.click(function(event) {
@@ -27,6 +33,12 @@
 				.appendTo(this.element)
 				.click(function(event) {
 					self.element.parent().metro('forward');
+				});
+
+			$('<li class="metro-menu-tail"></li>')
+				.appendTo(this.element)
+				.click(function(event) {
+					self.element.parent().metro('gotoTail');
 				});
 		},
 		

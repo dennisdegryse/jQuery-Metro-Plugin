@@ -89,12 +89,20 @@
 			this._getActiveSection()._metroSection('gotoPosition', position);
 		},
 
+		gotoHead : function() {
+			this._getActiveSection()._metroSection('gotoPosition', 0);
+		},
+
+		gotoTail : function() {
+			this._getActiveSection()._metroSection('gotoPosition', 1);
+		},
+
 		forward : function() {
-			this._getActiveSection()._metroSection('forward');
+			this._getActiveSection()._metroSection('shiftPage', 1);
 		},
 
 		reverse : function() {
-			this._getActiveSection()._metroSection('reverse');
+			this._getActiveSection()._metroSection('shiftPage', -1);
 		}
 	});
 })( jQuery );
