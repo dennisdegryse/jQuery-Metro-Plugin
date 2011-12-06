@@ -30,8 +30,8 @@
           opacity: 0;
       }
     </style>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/jquery.metro.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
@@ -63,7 +63,7 @@
               return false;
           };
 
-          var $metro = $('#metro').metro({
+          $('#metro').metro({
               formatter : function(record) {
                   var format = {
                     width : 1,
@@ -106,9 +106,9 @@
 
                   return $('<div style="background-color: #' + ['333', '555', '777'][Math.round(Math.random() * 2)] + '"><span>' + text + '</span></div>')
                     .hover(function () {
-                        $(this).children().animate({ 'opacity' : 1  }, 200);
+                        $(this).children().fadeIn();
                     }, function() {
-                        $(this).children().animate({ 'opacity' : 0  }, 200);
+                        $(this).children().fadeOut();
                     }).hide().fadeIn(1500);
               }
           });
@@ -128,16 +128,16 @@
 
           $(document).keydown(function(event) {
               if (event.keyCode == 39)
-                  acquireKeyLock() && $metro.forward();
+                  acquireKeyLock() && $('#metro').metro('forward');
 
               if (event.keyCode == 37)
-                  acquireKeyLock() && $metro.reverse();
+                  acquireKeyLock() && $('#metro').metro('reverse');
           });
 
           $('.section-link').click(function() {
               var target = $(this).attr('href').substr(1);
 
-              $metro.gotoSection(target);
+              $('#metro').metro('gotoSection', target);
 
               return false;
           });
