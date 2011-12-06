@@ -1,7 +1,6 @@
 (function( jQuery ) {
-    $.widget('metro._metroTileGroup', {
+    $.widget('dede._metroTileGroup', {
         options : {
-        	label : null,
         	size: 150,
         	spacing: 10
         },
@@ -17,7 +16,7 @@
         	};
         	
             this.element
-            	.addClass('metro-tile-group')
+            	.addClass('dede-metro-tile-group')
             	.attr('data-label', this.options.label);
             
             this.element.children().each(function() {
@@ -29,13 +28,23 @@
             	self.putTile(tile);
             });
 
-            $('<li class="metro-tile-group-label"></li>')
-            	.prependTo(this.element)
-            	.text(this.options.label);
+            $('<li class="dede-metro-tile-group-label"></li>')
+            	.prependTo(this.element);
+            
+            // UGLY!
+            this.label(this.label());
         },
         
         destroy : function() {
         	// TODO
+        },
+        
+        _getSection : function() {
+        	return this.element.parents('.dede-metro-section').first();
+        },
+        
+        _getLabel : function() {
+        	return this.element.children('.dede-metro-tile-group-label');
         },
         
         _advancePencil : function() {
@@ -71,24 +80,42 @@
 
             return true;
         },
-        
-        _getSection : function() {
-        	return this.element.parents('.metro-section').first();
-        },
 
         _expandCanvas : function() {
             for (var i = 0; i < this._getSection()._metroSection('getHeight'); i++)
                 this._canvas.push(false);
         },
-        
-        label : function() {
-        	return this.options.label;
-        },
 
+		/**
+		 * Get or set the label of the group
+		 * 
+		 * @param text		The label text to set (if specified)
+		 * @param return 	The label text (if no parameter is specified)
+		 */
+		label : function(text) {
+			// GET
+			if (text === undefined)
+				return this.element.attr('data-label');
+			
+			// SET
+			this.element.attr('data-label', text);
+			this._getLabel().text(text);
+		},
+		
+		/**
+		 * Get the size (number of horizontal tile units) of the tile group 
+		 * 
+		 * @returns		The number of horizontal tile units
+		 */
         size : function() {
             return this._canvas.length / this._getSection()._metroSection('getHeight');
         },
 
+        /**
+         * Put a new tile
+         * 
+         * @param tile	The tile to put
+         */
         putTile : function(tile) {
             var position = null;
             var o = this.options;

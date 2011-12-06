@@ -1,5 +1,5 @@
 (function( jQuery ) {
-    $.widget('metro._metroTile', {
+    $.widget('dede._metroTile', {
     	options : {
           record : null,
           width : 1,
@@ -15,7 +15,7 @@
             var o = this.options;
             
             this.element
-            	.addClass('metro-tile')
+            	.addClass('dede-metro-tile')
             	.css({
             		width : this._calcDimension(o.width),
             		height : this._calcDimension(o.height)
@@ -30,7 +30,7 @@
         },
         
         _getSection : function() {
-			return this.element.parents('.metro-section').first();
+			return this.element.parents('.dede-metro-section').first();
         },
         
         _calcDimension : function(scalar) {

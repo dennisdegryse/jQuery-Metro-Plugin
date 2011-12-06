@@ -1,5 +1,5 @@
 (function( jQuery ) {
-	$.widget('metro.metro', {
+	$.widget('dede.metro', {
 		version : "@VERSION",
 	
 		options : {
@@ -17,7 +17,7 @@
 			var sections = this.element.children('section');
 	
 			this.element
-				.addClass('metro');
+				.addClass('dede-metro');
 
 			if (o.controlsMenu)
 				$('<menu></menu>')
@@ -32,10 +32,10 @@
 				.css('left', this.element.width())
 				.on('moved', function(event, position) {
 					self._getControlsMenu()
-						._metroControlsMenu('update', position.x, position.label);
+						._metroControlsMenu('state', position);
 				});
 
-			this.gotoSection(sections.first().attr('data-label'));
+			this.section(sections.first()._metroSection('label'));
 		},
 	
 		destroy : function() {
@@ -43,7 +43,7 @@
 		},
 
 		_getSections : function(label) {
-			var sections = this.element.children('.metro-section');
+			var sections = this.element.children('.dede-metro-section');
 	
 			if (label !== undefined)
 				return sections.filter('[data-label="' + label + '"]');
@@ -52,15 +52,27 @@
 		},			
 
 		_getControlsMenu : function() {
-			return this.element.children('.metro-menu');
+			return this.element.children('.dede-metro-menu');
 		},
 
 		_getActiveSection : function() {
 			return this._getSections().filter('.active');
 		},
 
-		gotoSection : function(label) {
+		/**
+		 * Get or set the active section (by label)
+		 * 
+		 * @param label	The label of the section to navigate to (if specified)
+		 * @returns 	The label of the active section (if no parameter is specified)
+		 */
+		section : function(label) {
 			var activeSection = this._getActiveSection();
+			
+			// GET
+			if (label === undefined)
+				return activeSection._metroSection('label');
+			
+			// SET
 			var section = this._getSections(label);
 			var position = this.element.width();
 			var speed = position * 0.3;
@@ -82,25 +94,40 @@
 			}, speed);
 	
 			this._getControlsMenu()
-				._metroControlsMenu('update', section._metroSection('getPosition'));
+				._metroControlsMenu('state', { x : section._metroSection('pos'), label: label} );
 		},
 
-		gotoPosition : function(position, scale) {
-			this._getActiveSection()._metroSection('gotoPosition', position);
+		/**
+		 * Get or set the position of the active section
+		 * 
+		 * @param position		The position (in %|head|tail) to set (if supplied)
+		 * @returns				The current position in % (if no parameter is supplied)
+		 */
+		pos : function(position) {
+			// GET
+			if (position === undefined)
+				return this._getActiveSection()._metroSection('pos');
+			
+			// SET
+			if (position == 'head')
+				position = 0;
+			
+			if (position == 'tail')
+				position = 1;
+			
+			this._getActiveSection()._metroSection('pos', position);
 		},
 
-		gotoHead : function() {
-			this._getActiveSection()._metroSection('gotoPosition', 0);
-		},
-
-		gotoTail : function() {
-			this._getActiveSection()._metroSection('gotoPosition', 1);
-		},
-
+		/**
+		 * Move one page forward in the active section
+		 */
 		forward : function() {
 			this._getActiveSection()._metroSection('shiftPage', 1);
 		},
 
+		/**
+		 * Move one page backward in the active section
+		 */
 		reverse : function() {
 			this._getActiveSection()._metroSection('shiftPage', -1);
 		}

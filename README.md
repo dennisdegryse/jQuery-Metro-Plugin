@@ -18,8 +18,9 @@ Requirements
 ----------------
 
 This jQuery plugin requires:
-   * jQuery v1.7.x
-   * jQuery-ui v1.8.x
+   * [jQuery v1.7.x](https://github.com/jquery/jquery)
+   * [jQuery UI v1.8.x](https://github.com/jquery/jquery-ui)
+   * [jQuery LabeledScrollbar Plugin](https://github.com/dennisdegryse/jQuery-LabeledScrollbar-Plugin)
    * HTML5 (fix this with [html5shiv](http://code.google.com/p/html5shiv/) for older versions of IE)
 
 

@@ -1,5 +1,5 @@
 (function( jQuery ) {
-	$.widget('metro._metroControlsMenu', {
+	$.widget('dede._metroControlsMenu', {
 		version : '@VERSION',
 		
 		options : {
@@ -8,37 +8,37 @@
 		_create : function() {
 			var self = this;
 			
-			this.element.addClass('metro-menu');
+			this.element.addClass('dede-metro-menu');
 
-			$('<li class="metro-menu-head"></li>')
+			$('<li class="dede-metro-menu-head"></li>')
 				.appendTo(this.element)
 				.click(function(event) {
-					self.element.parent().metro('gotoHead');
+					self.element.parent().metro('pos', 'head');
 				});
 
-			$('<li class="metro-menu-reverse"></li>')
+			$('<li class="dede-metro-menu-reverse"></li>')
 				.appendTo(this.element)
 				.click(function(event) {
 					self.element.parent().metro('reverse');
 				});
 
-			$('<li class="metro-menu-scroll"></li>')
-				._metroScrollBar({})
+			$('<li class="dede-metro-menu-scroll"></li>')
+				.labeledScrollbar({})
 				.appendTo(this.element)
 				.bind('scroll', function(event, x) {
-					self._getMetro().metro('gotoPosition', x);
+					self._getMetro().metro('pos', x);
 				});
 
-			$('<li class="metro-menu-forward"></li>')
+			$('<li class="dede-metro-menu-forward"></li>')
 				.appendTo(this.element)
 				.click(function(event) {
 					self.element.parent().metro('forward');
 				});
 
-			$('<li class="metro-menu-tail"></li>')
+			$('<li class="dede-metro-menu-tail"></li>')
 				.appendTo(this.element)
 				.click(function(event) {
-					self.element.parent().metro('gotoTail');
+					self.element.parent().metro('pos', 'tail');
 				});
 		},
 		
@@ -47,18 +47,31 @@
 		},
 		
 		_getMetro : function() {
-			return this.element.parents('.metro').first();
+			return this.element.parents('.dede-metro').first();
 		},
 		
 		_getScrollBar : function() {
-			return this.element.children('.metro-menu-scroll');
+			return this.element.children('.dede-metro-menu-scroll');
 		},
 
-		update : function(x, label) {
+		/**
+		 * Get or set the state of the control menu
+		 * 
+		 * @param state	The state to set (if supplied)
+		 * @returns 	The current state (if no parameter is supplied)
+		 */
+		state : function(state) {
 			var scrollBar = this._getScrollBar();
+			
+			// GET
+			if (state === undefined)
+				return {
+					x: scrollBar.labeledScrollbar('pos'),
+					label: scrollBar.labeledScrollbar('label')};
 
-			scrollBar._metroScrollBar('move', x);
-			scrollBar._metroScrollBar('label', label);
+			// SET
+			scrollBar.labeledScrollbar('pos', state.x);
+			scrollBar.labeledScrollbar('label', state.label);
 		}
 	});
 })( jQuery );

@@ -13,7 +13,6 @@ BASE_FILES = ${SRC_DIR}/markupParams.js\
     ${SRC_DIR}/metroTile.js\
 	${SRC_DIR}/metroTileGroup.js\
 	${SRC_DIR}/metroSection.js\
-	${SRC_DIR}/metroScrollBar.js\
 	${SRC_DIR}/metroControlsMenu.js\
 	${SRC_DIR}/metro.js
 

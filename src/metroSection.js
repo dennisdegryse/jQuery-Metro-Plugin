@@ -1,5 +1,5 @@
 (function( jQuery ) {
-	$.widget('metro._metroSection', {
+	$.widget('dede._metroSection', {
 		options : {
 		  size: 150,
 		  spacing: 10,
@@ -28,9 +28,9 @@
 			};
 				  
 			this.element
-				.addClass('metro-section');
+				.addClass('dede-metro-section');
 
-			var container = $('<div class="metro-tile-container"></div>')
+			var container = $('<div class="dede-metro-tile-container"></div>')
 				.appendTo(this.element)
 				.draggable({ axis : 'x' })
 				.css({
@@ -58,9 +58,26 @@
 			if (o.source)
 				this._fetchData();
 		},
-		
+
 		_getMetro : function() {
-			return this.element.parents('.metro').first();
+			return this.element.parents('.dede-metro').first();
+		},
+
+		_getContainer : function() {
+			return this.element.children('.dede-metro-tile-container');
+		},
+		
+		_getGroups : function(label) {
+			var groups = this._getContainer().children('.dede-metro-tile-group');
+
+			if (label !== undefined) {
+				groups = groups.filter('[data-label="' + label + '"]');
+			
+				if (groups.length == 0)
+					groups = this._addGroup(label);
+			}
+
+			return groups;
 		},
 
 		_fetchData : function() {
@@ -150,24 +167,26 @@
 		_calcScale : function() {
 			return this._calcSize() - this._getMetro().width();
 		},
-
-		_getContainer : function() {
-			return this.element.children('.metro-tile-container');
-		},
 		
-		_getGroups : function(label) {
-			var groups = this._getContainer().children('.metro-tile-group');
-
-			if (label !== undefined) {
-				groups = groups.filter('[data-label="' + label + '"]');
+		/**
+		 * Get or set the label of the section
+		 * 
+		 * @param text		The label text to set (if specified)
+		 * @param return 	The label text (if no parameter is specified)
+		 */
+		label : function(text) {
+			if (text === undefined)
+				return this.element.attr('data-label');
 			
-				if (groups.length == 0)
-					groups = this._addGroup(label);
-			}
-
-			return groups;
+			this.element.attr('data-label', text);
 		},
 		
+		/**
+		 * Get the group that is currently visible to the user or the group that would be visible given a position.
+		 * 
+		 * @param position	The position (optional)
+		 * @returns			The group that is visible to the user
+		 */
 		getActiveGroup : function(position) {
 			var group = null;
 			var self = this;
@@ -187,23 +206,40 @@
 			return group;
 		},
 		
+		/**
+		 * Get the number of tile units in the vertical direction
+		 * 
+		 * @returns	The number of tile units
+		 */
 		getHeight : function() {
 			return this._dimensions.height;
 		},
 
-		getPosition : function() {
-			return - this._getContainer().position().left / this._calcScale();
+		/**
+		 * Get or set the position
+		 * 
+		 * @param percentage	The position in % to set (if supplied)
+		 * @returns				The current position in % (if no parameter is supplied)
+		 */
+		pos : function(position) {
+			// GET
+			if (position === undefined)
+				return - this._getContainer().position().left / this._calcScale();
+			
+			// SET
+			this._move(- this._calcScale() * position);
 		},
 		
+		/**
+		 * Shift an amount of pages in a certain direction (forward: positive, reverse: negative)
+		 * 
+		 * @param delta	The amount of pages to shift
+		 */
 		shiftPage : function(delta) {
 			var size = this._calcScale();
 			var target = Math.min(0, Math.max(this._getContainer().position().left - delta * this._dimensions.width * (this.options.size + this.options.spacing), -size));
 
 			this._move(target);
-		},
-
-		gotoPosition : function(position) {
-			this._move(- this._calcScale() * position);
 		}
 	});
 })( jQuery );

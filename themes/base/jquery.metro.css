@@ -1,9 +1,9 @@
-.metro {
+.dede-metro {
     position: relative;
     overflow: hidden;
 }
 
-.metro-section {
+.dede-metro-section {
     display: block;
     position: absolute;
     overflow: hidden;
@@ -13,11 +13,11 @@
     opacity: 0.3;
 }
 
-.metro-section.active {
+.dede-metro-section.active {
     opacity: 1;
 }
 
-.metro-tile-group {
+.dede-metro-tile-group {
     display: block;
     margin: 0px;
     padding: 0px;
@@ -27,7 +27,7 @@
     list-style: none;
 }
 
-.metro-tile-group-label {
+.dede-metro-tile-group-label {
     font-family: sans-serif;
     font-size: 2em;
     left: 0px;
@@ -39,7 +39,7 @@
     margin: 0px;
 }
 
-.metro-tile-container {
+.dede-metro-tile-container {
     display: block;
     margin: 0px;
     padding: 0px;
@@ -47,25 +47,21 @@
     height: 100%;
 }
 
-.metro-tile {
+.dede-metro-tile {
     position: absolute;
     display: block;
     padding: 0px;
     margin: 0px;
 }
 
-.metro-tile.outsight {
-    opacity: 0.2;
-}
-
-.metro-tile > * {
+.dede-metro-tile > * {
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 }
 
-.metro-menu {
+.dede-metro-menu {
     display: block;
     padding: 0px;
     margin: 0px;
@@ -78,12 +74,12 @@
     list-style: none;
 }
 
-.metro-menu > * {
+.dede-metro-menu > * {
     padding: 0;
     margin: 0;
 }
 
-.metro-menu-forward {
+.dede-metro-menu-forward {
     position: absolute;
     right: 30px;
     width: 30px;
@@ -92,7 +88,7 @@
     top: 0px;
 }
 
-.metro-menu-reverse {
+.dede-metro-menu-reverse {
     position: absolute;
     left: 30px;
     width: 30px;
@@ -101,7 +97,7 @@
     top: 0px;
 }
 
-.metro-menu-tail {
+.dede-metro-menu-tail {
     position: absolute;
     right: 0px;
     width: 30px;
@@ -110,7 +106,7 @@
     top: 0px;
 }
 
-.metro-menu-head {
+.dede-metro-menu-head {
     position: absolute;
     left: 0px;
     width: 30px;
@@ -119,30 +115,10 @@
     top: 0px;
 }
 
-.metro-menu-scroll {
+.dede-metro-menu-scroll {
     position: absolute;
     left: 60px;
     right: 60px;
     height: 10px;
-    background: #222;
     top: 10px;
-}
-
-.metro-scrollbar-handle {
-    display: block;
-    width: 50px;
-    height: 100%;
-    background: #ccc;
-}
-
-.metro-scrollbar-label {
-	top : -50px;
-	height: 50px;
-	width: 50px;
-	position: absolute;
-	display: block;
-	background: #fff;
-	color: #222;
-	font-size: 2em;
-	text-align: center; 
 }
