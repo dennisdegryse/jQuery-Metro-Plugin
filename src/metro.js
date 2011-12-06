@@ -30,9 +30,9 @@
 					  grouper : o.grouper,
 					  viewer : o.viewer })
 				.css('left', this.element.width())
-				.on('moved', function(event, x) {
+				.on('moved', function(event, position) {
 					self._getControlsMenu()
-						._metroControlsMenu('update', x);
+						._metroControlsMenu('update', position.x, position.label);
 				});
 
 			this.gotoSection(sections.first().attr('data-label'));

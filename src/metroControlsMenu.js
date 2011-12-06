@@ -42,8 +42,11 @@
 			return this.element.children('.metro-menu-scroll');
 		},
 
-		update : function(position) {
-			this._getScrollBar()._metroScrollBar('move', position);
+		update : function(x, label) {
+			var scrollBar = this._getScrollBar();
+
+			scrollBar._metroScrollBar('move', x);
+			scrollBar._metroScrollBar('label', label);
 		}
 	});
 })( jQuery );

@@ -39,7 +39,9 @@
 					width : 1 })
 				.on('drag', 
 					function(event) {
-						self.element.trigger('moved', - self._getContainer().position().left / self._calcScale());
+						var x = -self._getContainer().position().left / self._calcScale();
+						
+						self.element.trigger('moved', { x : x, label : self.getActiveGroup(x)._metroTileGroup('label') });
 					});
 
 			this.element.children('ul').each(function(){
@@ -86,6 +88,7 @@
 		},
 
 		_move : function(position) {
+			var x = -position / this._calcScale();
 			var container = this._getContainer();
 			var original = container.position().left;
 			var diff = Math.abs(original - position);
@@ -97,6 +100,8 @@
 			else
 				container
 					.css({ left : position });
+			
+			this.element.trigger('moved', { x : x, label : this.getActiveGroup(x)._metroTileGroup('label') } );
 		},
 
 		_reorderGroups : function() {
@@ -168,7 +173,25 @@
 			var target = Math.min(0, Math.max(this._getContainer().position().left - delta * this._dimensions.width * (this.options.size + this.options.spacing), -size));
 
 			this._move(target);
-			this.element.trigger('moved', -target / size);
+		},
+		
+		getActiveGroup : function(position) {
+			var group = null;
+			var self = this;
+			
+			if (position === undefined)
+				position = -this.position().left;
+			else 
+				position *= this._calcScale();
+			
+			this._getGroups().each(function() {
+				var left = $(this).position().left;
+				
+				if (group === null || left - self._offset.x < position)
+					group = $(this);
+			});
+			
+			return group;
 		},
 		
 		getHeight : function() {

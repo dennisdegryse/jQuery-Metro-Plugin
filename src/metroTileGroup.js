@@ -80,6 +80,10 @@
             for (var i = 0; i < this._getSection()._metroSection('getHeight'); i++)
                 this._canvas.push(false);
         },
+        
+        label : function() {
+        	return this.options.label;
+        },
 
         size : function() {
             return this._canvas.length / this._getSection()._metroSection('getHeight');
